@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welfare Intelligence Hub | 2026 Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        :root {
+            --mck-blue: #002D72;
+            --mck-accent: #0563C1;
+            --bg-gray: #F8F9FB;
+            --white: #ffffff;
+            --border: #E2E8F0;
+        }
+
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-gray); margin: 0; color: #1A1A1A; scroll-behavior: smooth; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px 100px; }
+
+        /* CENTERED HEADER STYLES */
+        header { 
+            background: var(--white); 
+            padding: 40px 0; 
+            border-bottom: 1px solid var(--border); 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            text-align: center; /* Centers all content */
+        }
+        
+        .nav-container {
+            display: flex;
+            flex-direction: column; /* Stacks logo above text */
+            align-items: center;
+            gap: 20px;
+        }
+
+        .company-logo { 
+            height: 80px; /* Slightly larger for center prominence */
+            width: auto; 
+            object-fit: contain; 
+        }
+
+        .header-text h1 { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 2.8rem; 
+            color: var(--mck-blue); 
+            margin: 10px 0 0 0; 
+        }
+
+        .eyebrow { 
+            font-size: 0.8rem; 
+            font-weight: 700; 
+            color: var(--mck-accent); 
+            text-transform: uppercase; 
+            letter-spacing: 2px;
+            display: block;
+        }
+
+        .section-label { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--mck-blue); margin: 60px 0 25px; text-align: center; }
+
+        /* Category Grid */
+        .category-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .cat-card { 
+            background: var(--white); padding: 40px 30px; border-radius: 4px; border-top: 5px solid var(--mck-blue);
+            cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center;
+        }
+        .cat-card:hover { transform: translateY(-8px); box-shadow: 0 20px 30px rgba(0,0,0,0.1); }
+        .cat-card.active { background: var(--mck-blue); color: white; }
+
+        /* Selection Zone */
+        .selection-zone { 
+            background: var(--white); padding: 50px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin-top: 60px; display: none; border-left: 8px solid var(--mck-accent);
+        }
+        .control-group { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 40px; }
+        select { 
+            width: 100%; max-width: 600px; padding: 18px; border-radius: 4px; border: 2px solid var(--border);
+            font-size: 1.1rem; font-family: 'Inter'; outline: none; cursor: pointer; color: var(--mck-blue);
+        }
+
+        /* Results List */
+        .scheme-results { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .scheme-card { 
+            background: white; padding: 25px; border-radius: 4px; border: 1px solid var(--border);
+            cursor: pointer; transition: 0.2s; border-left: 4px solid #ddd;
+        }
+        .scheme-card:hover { border-left-color: var(--mck-accent); background: #f9fbff; transform: scale(1.01); }
+        .scheme-name { font-weight: 600; font-size: 1.15rem; color: var(--mck-blue); display: block; margin-bottom: 10px; }
+        
+        .beneficiary-tag { 
+            font-size: 0.9rem; color: #444; background: #F1F5F9; padding: 10px 15px; border-radius: 4px; 
+        }
+        .beneficiary-tag strong { color: var(--mck-accent); text-transform: uppercase; font-size: 0.75rem; }
+
+        /* Modal Overlay */
+        .modal-overlay { 
+            position: fixed; inset: 0; background: rgba(0,45,114,0.9); backdrop-filter: blur(10px);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content { 
+            background: white; width: 90%; max-width: 900px; max-height: 85vh; border-radius: 4px; 
+            padding: 60px; position: relative; overflow-y: auto;
+        }
+        .close-modal { position: absolute; top: 25px; right: 30px; font-size: 2.5rem; cursor: pointer; color: #ccc; }
+        .detail-group { margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        .detail-label { font-weight: 700; color: var(--mck-accent); font-size: 0.75rem; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .detail-value { font-size: 1.1rem; line-height: 1.6; color: #333; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="nav-container">
+        <img src="https://lh3.googleusercontent.com/d/1ZPt4G_Eb2YvHfqR7PO3zg4dulEMZB0ym" alt="KASE Logo" class="company-logo">
+        <div class="header-text">
+            <span class="eyebrow">Kerala Academy for Skills Excellence | IT Division</span>
+            <h1>Government Scheme Portfolio</h1>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="section-label">Select a Strategic Sector</div>
+    <div class="category-grid" id="categoryGrid"></div>
+
+    <div id="selectionZone" class="selection-zone">
+        <div class="control-group">
+            <label style="font-weight: 600; color: var(--mck-blue); text-transform: uppercase; font-size: 0.8rem;">Refine by Scheme Type</label>
+            <select id="typeDropdown" onchange="renderSchemes()">
+                <option value="">Select Type...</option>
+            </select>
+        </div>
+        <div id="schemeResults" class="scheme-results"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <div id="modalBody"></div>
+    </div>
+</div>
+
+<script>
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTQaeG_c4PecqPbA43kVDPAvNLd954Sbm-Lou1UsmHwnw4_BhV-TFsmxoVatQQaSuiK5aYx6jwGzLiQ/pub?gid=1265527470&single=true&output=csv';
+    let masterData = [];
+    let currentCategory = "";
+
+    Papa.parse(CSV_URL, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+            masterData = results.data.filter(r => r.Category && r['Scheme Name']);
+            initCategories();
+        }
+    });
+
+    function initCategories() {
+        const cats = [...new Set(masterData.map(d => d.Category))];
+        document.getElementById('categoryGrid').innerHTML = cats.map(cat => `
+            <div class="cat-card" onclick="selectCategory('${cat}', this)">
+                <h3>${cat}</h3>
+            </div>
+        `).join('');
+    }
+
+    function selectCategory(cat, el) {
+        currentCategory = cat;
+        document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+
+        const types = [...new Set(masterData.filter(d => d.Category === cat).map(d => d['Scheme Type']))];
+        const dropdown = document.getElementById('typeDropdown');
+        dropdown.innerHTML = `<option value="">Select Scheme Type...</option>` + 
+            types.sort().map(t => `<option value="${t}">${t}</option>`).join('');
+
+        const zone = document.getElementById('selectionZone');
+        zone.style.display = 'block';
+        document.getElementById('schemeResults').innerHTML = '';
+        zone.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function renderSchemes() {
+        const type = document.getElementById('typeDropdown').value;
+        if (!type) return;
+
+        const filtered = masterData.filter(d => d.Category === currentCategory && d['Scheme Type'] === type);
+        const container = document.getElementById('schemeResults');
+        
+        container.innerHTML = `<div style="font-weight:600; margin-bottom:20px; color:var(--mck-blue)">Matching Schemes:</div>` + 
+        filtered.map(s => {
+            const safeName = s['Scheme Name'].replace(/'/g, "\\'");
+            return `
+                <div class="scheme-card" onclick="openDetails('${safeName}')">
+                    <span class="scheme-name">${s['Scheme Name']}</span>
+                    <div class="beneficiary-tag">
+                        <strong>Target Beneficiaries:</strong> ${s['Target Beneficiaries']}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function openDetails(schemeName) {
+        const s = masterData.find(d => d['Scheme Name'] === schemeName);
+        if (!s) return;
+
+        const displayFields = [
+            'Ministry / Department', 'Implementing Agency', 'Scheme Type', 
+            'Target Beneficiaries', 'Sector', 'Description', 'Key Benefits', 
+            'Eligibility', 'Financial/Non-Financial Support'
+        ];
+
+        document.getElementById('modalBody').innerHTML = `
+            <h2 style="font-family:'Playfair Display'; color:var(--mck-blue); font-size:2.2rem; margin-bottom:40px; border-bottom:4px solid var(--mck-accent); padding-bottom:15px;">${s['Scheme Name']}</h2>
+            ${displayFields.map(f => `
+                <div class="detail-group">
+                    <span class="detail-label">${f}</span>
+                    <div class="detail-value">${s[f] || 'Data not specified'}</div>
+                </div>
+            `).join('')}
+        `;
+        document.getElementById('modalOverlay').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
+</script>
+
+</body>
+</html>
